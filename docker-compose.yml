@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+  rabbitmq-producers:
+    container_name: rabbitmq-producers
+    build:
+      context: .
+      dockerfile: ./rabbitmq-producers.Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+
+  rabbitmq-consumers:
+    container_name: rabbitmq-consumers
+    build:
+      context: .
+      dockerfile: ./rabbitmq-consumers.Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
